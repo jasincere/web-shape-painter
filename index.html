@@ -1,0 +1,270 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Picture Parts Response</title>
+
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        body {
+            padding-left: 20px;
+        }
+        h2{
+            margin:10px 0;
+            color:forestgreen;
+
+        }
+
+        input {
+            margin: 10px;
+        }
+
+        .container {
+            margin: 40px 0;
+            width: 800px;
+            height: 500px;
+            padding: 5px;
+            position: relative;
+            border: 1px solid #808080;
+            background-color: #eee;
+            overflow: hidden;
+        }
+
+        #img-box {
+            overflow: hidden;
+            position: relative;
+            /*z-index:999;*/
+            border: 1px dashed #808080;
+            width: 800px;
+            height: 500px;
+            box-sizing: border-box;
+        }
+
+        .box-add {
+            cursor: crosshair;
+        }
+
+        #img-box img {
+            -webkit-user-drag: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        /*UI 切换卡 添加删除按钮*/
+        .question-ui {
+            margin: 10px;
+            overflow: hidden;
+        }
+
+        .typeTab {
+            float: left;
+            overflow: hidden;
+            margin: 0 10px;
+        }
+
+            .typeTab li {
+                border: 1px solid #aaa;
+                width: 80px;
+                height: 30px;
+                list-style: none;
+                float: left;
+                background-color: #fff;
+                color: #aaa;
+                text-align: center;
+                line-height: 30px;
+                cursor: pointer;
+            }
+
+                .typeTab li.active {
+                    background-color: #aaa;
+                    color: #fff;
+                }
+
+        .question-ui .ui-btn {
+            width: 120px;
+            height: 30px;
+            border: none;
+            background-color: #0d9fff;
+            color: #fff;
+            float: left;
+            margin:0 10px;
+        }
+        /*图形*/
+        .box-edit .area {
+            cursor: move;
+        }
+
+        .area {
+            background-color: rgba(255,255,255,.7);
+            position: absolute;
+            border: 1px solid #ccc;
+            user-select: none;
+            -webkit-user-select: none;
+            text-align:center;
+            
+        }
+        .area .index{
+            position:absolute;
+            left:50%;
+            top:50%;
+            border:none;
+            font-size:20px;
+            font-weight:bold;
+            color:#000;
+            overflow:hidden;
+            background-color:rgba(255,255,255,0);
+        }
+        
+
+        .area-rect {
+        }
+
+        .area-circle {
+            border-radius: 50%;
+        }
+        /*图形区域选中缩放样式ʽ*/
+        .area.area-selected {
+            outline: #06e3fa dashed thin;
+        }
+
+        .area-selected span {
+            position: absolute;
+            display: block;
+            width: 7px;
+            height: 7px;
+            background-color: #fff;
+            border: .5px solid #aaa;
+            margin-left: -4px;
+            margin-top: -4px;
+        }
+
+            .area-selected span.r-lt {
+                left: 0;
+                top: 0;
+                cursor: nw-resize;
+            }
+
+            .area-selected span.r-l {
+                left: 0;
+                top: 50%;
+                cursor: w-resize;
+            }
+
+            .area-selected span.r-lb {
+                left: 0;
+                top: 100%;
+                cursor: nesw-resize;
+            }
+
+            .area-selected span.r-b {
+                left: 50%;
+                top: 100%;
+                cursor: ns-resize;
+            }
+
+            .area-selected span.r-rb {
+                left: 100%;
+                top: 100%;
+                cursor: nwse-resize;
+            }
+
+            .area-selected span.r-r {
+                left: 100%;
+                top: 50%;
+                cursor: ew-resize;
+            }
+
+            .area-selected span.r-rt {
+                left: 100%;
+                top: 0;
+                cursor: ne-resize;
+            }
+
+            .area-selected span.r-t {
+                left: 50%;
+                top: 0;
+                cursor: n-resize;
+            }
+            /*答题*/
+            .box-res{
+                position:relative;
+                cursor:pointer;
+            }
+            .res-point{
+                position:absolute;
+                width:20px;
+                height:20px;
+                background-color:rgba(245, 9, 9, 0.66);
+                border-radius:10px;
+                /* 点内number*/
+                color:#fff;
+                font-size:15px;
+                text-align:center;
+                line-height:20px;
+            }
+            #mark-result{
+                border:1px solid forestgreen;
+            }
+            #mark-result p{
+                color:forestgreen;
+                margin:5px 0;
+                padding-left:10px;
+                height:15px;
+                line-height:15px;
+            }
+            /*...*/
+            #response,#testview{
+                display:none;
+                margin:10px 0;
+            }
+            .box-view{
+                position:relative;
+
+            }
+    </style>
+</head>
+<body>
+    <h2>出题</h2>
+    <input id="uploadBtn" type="file" accept="image/*" value="" />
+    <div class="question-ui">
+        <button class="ui-btn" id="addBtn">draw</button>
+        <ul class="typeTab">
+            <li data-index="0" class="active">circle</li>
+            <li data-index="1">rectangle</li>
+        </ul>
+        <button class="ui-btn" id="delBtn">delete</button>
+        <button class="ui-btn" id="previewBtn">preview</button>
+    </div>
+    <div class="container">
+        <div id="img-box" class="box-edit">
+
+        </div>
+    </div>
+    <div id="response">
+    <h2>答题</h2>
+    <div class="container">
+        <div id="img-box-res" class="box-res">
+        </div>
+    </div>
+    <div class="question-ui">
+        <button class="ui-btn submitPoint" id="submitBtn">submit</button>
+        <button class="ui-btn" id="testviewBtn">view answers</button>
+    </div>
+    <div id="mark-result">
+    </div>
+        </div>
+    <div id="testview">
+        <h2>查看结果</h2>
+        <div class="container">
+            <div id="img-box-view" class="box-view" width="800" height="500">
+            </div>
+        </div>
+    </div>
+    <script src="js/index.js"></script>
+    <script src="js/area.js"></script>
+    <script src="js/response.js"></script>
+</body>
+</html>
