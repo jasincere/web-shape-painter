@@ -4,10 +4,8 @@
     document.getElementById("uploadBtn").addEventListener("change", previewImg);
 //定义外围边界box
     var imgBox = document.getElementById("img-box");
-    var imgBoxRes = document.getElementById("img-box-res");
-    var imgBoxView = document.getElementById("img-box-view");
     var imgSrc;
-    var testView = false;
+    var shape = new QuestionShape(imgBox);
 
     //图片预览函数
     function previewImg(e) {
@@ -20,20 +18,22 @@
             img.src = evt.target.result;
         }
         imgBox.innerHTML = "";
-        imgBox.appendChild(img);
         img.onload = function () {
             //图片自适应container尺寸
-            console.log(img.width);
-            console.log(img.height);
-            var w = img.width, h = img.height;
+            var w = img.width, h = img.height, bh, bw;
+            var ratio = w / h;
             var ratio = w / h;
             if (boxRatio >= ratio) {
-                img.height = boxHeight;
+                bh = boxHeight;
+                bw = Math.round(boxHeight * ratio);
             } else {
-                img.width = boxWidth;
+                bw = boxWidth;
+                bh = Math.round(boxWidth / ratio);
             }
-            imgBox.style.width = img.width + "px";
-            imgBox.style.height = img.height + "px";
+            imgBox.style.width = bw + "px";
+            imgBox.style.height = bh + "px";
+            imgBox.style.backgroundImage = "url('" + imgSrc + "')";
+            imgBox.style.backgroundSize = bw+"px "+bh+"px";
         }
     }
 
@@ -44,7 +44,7 @@
             if (this.nextElementSibling) this.nextElementSibling.classList.remove("active");
             else this.previousElementSibling.classList.remove("active");
             this.classList.add("active");
-            draw.type=parseInt(this.getAttribute("data-index"));
+            shape.draw.type=Boolean(this.getAttribute("data-index"));
         });
     }
 
@@ -53,10 +53,8 @@
             alert("no image");
             return;
         }
-        imgBox.addEventListener("mousedown", draw, true);
+        imgBox.addEventListener("mousedown", shape.draw, true);
         imgBox.className="box-add";
-        selected.unselectArea();
-        selected.selectedObj = null;
         console.log("addArea");
     });
     document.getElementById("delBtn").addEventListener("click", function () {
@@ -67,39 +65,6 @@
         selected.deleteArea();
     });
 
-    document.getElementById("previewBtn").addEventListener("click", function () {
-        if (!imgSrc) {
-            alert("no image");
-            return;
-        }
-        if(areaArr.length==0){
-            alert("no area created");
-            return;
-        }
-        paintImg(imgBoxRes);
-        imgBoxRes.addEventListener("click", res, true);
-        document.getElementById("submitBtn").addEventListener("click", res);
-        document.getElementById("response").style.display="block";
-    });
-    document.getElementById("testviewBtn").addEventListener("click", function () {
-        if (!testView) {
-            alert("you should submit your response first");
-            return;
-        }
-        paintImg(imgBoxView);
-        score.testView();
-        document.getElementById("testview").style.display = "block";
-    });
-
-    function paintImg(imgBox) {
-        var img = new Image();
-        img.src = imgSrc;
-        img.width = box.bound.x;
-        img.height = box.bound.y;
-        imgBox.style.width = box.bound.x+"px";
-        imgBox.style.height = box.bound.y+"px";
-        imgBox.appendChild(img);
-    }
 
     
     
